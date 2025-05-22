@@ -1,6 +1,6 @@
 import queue
-import cv2 as cv
 import threading
+import cv2 as cv
 
 # Default values
 CAMERA_FRAME_WIDTH = cv.CAP_PROP_FRAME_WIDTH
@@ -12,7 +12,7 @@ class Capture:
         self.__width = width
         self.__height = height
 
-    def start_video(self, frame_queue: queue.Queue, landmark_queue: queue.Queue, stop_condition: threading.Event):
+    def start_video(self, camera_queue: queue.Queue, support_queue: queue.Queue, stop_condition: threading.Event):
         if not self.__camera.isOpened():
             print("Error starting camera.")
             exit()
@@ -21,31 +21,24 @@ class Capture:
             ret, frame = self.__camera.read()
 
             if not ret:
-                #("Error receiving frames.")
+                print("Error receiving frames.")
                 continue
 
+            # NOTE ON TIMEOUT
             # The timeout value actually stops the execution of the whole while loop therefore creating a video
             # "freeze" of the duration of the timeout. It needs to be set as low as possible otherwise it doesn't
-            # feel smooth enough
+            # feel smooth enough.
 
             try:
-                frame_queue.put(frame, timeout=0.1)
+                support_queue.put(frame, timeout=0.1)
             except queue.Full:
-                #print('Frame queue is full, skipped frame.')
+                print('Support queue is full, skipped frame.')
                 pass
 
-            #    In case a greyscale image is required
-            #    frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-            cv.imshow('Frame', frame)
-
-            #if landmark_queue.empty():
-            #    print('Landmark queue is empty.')
-            #    continue
-
-            #cv.imshow('Landmark', landmark_queue.get())
-            if cv.waitKey(1) == ord('q'):
-                stop_condition.set()
-                break
+            try:
+                camera_queue.put(frame, timeout=0.1)
+            except queue.Full:
+                print('Camera queue is full, skipped frame.')
 
     def end_video(self):
         self.__camera.release()
