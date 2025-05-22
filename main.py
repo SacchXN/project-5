@@ -32,11 +32,9 @@ while True:
 
     if not camera_queue.empty():
         cv.imshow('Frame', camera_queue.get())
-        #print(1)
 
     if not landmark_queue.empty():
         cv.imshow('Landmark', landmark_queue.get())
-        #print(2)
 
     if cv.waitKey(1) == ord('q'):
         stop_condition.set()
