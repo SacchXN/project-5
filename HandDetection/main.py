@@ -4,11 +4,12 @@ import cv2 as cv
 import camera
 import hand_detection
 
-
 # NOTE ON CV2 AND THREADING INTERACTION:
 # The stream of cv2.imshow() needs to be in the main because there can be freezes or issues if being used within
 # threaded functions: cv2.imshow() and other functions (like cv2.waitKey()) called from threads can lead to race
 # conditions/deadlocks/other behavior
+
+## Possible improvements: put lock on queues to avoid race conditions?
 
 # Support variables
 camera_queue = queue.Queue(maxsize=10)
@@ -23,10 +24,11 @@ video_thread.start()
 
 # Hand detection thread
 hand_detect = hand_detection.HandDetection()
-hand_thread = threading.Thread(target=hand_detect.start_detection, args=(landmark_queue, support_queue, stop_condition,
+hand_thread = threading.Thread(target=hand_detect.start_detection_draw, args=(landmark_queue, support_queue, stop_condition,
                                                                          2))
 hand_thread.start()
 
+# showOnScreen:
 # Show camera and landmark frames on screen
 while True:
 

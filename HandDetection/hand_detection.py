@@ -50,11 +50,12 @@ def draw_landmarks_on_image(rgb_image, detection_result):
     return annotated_image
 
 class HandDetection:
-    def __init__(self, path: str = r'./hand_landmarker.task'):
+    def __init__(self, path: str = r'../hand_landmarker.task'):
         self.__base_options = python.BaseOptions(model_asset_path = path)
         self.__landmarker = None
 
-    def start_detection(self, landmark_queue: queue.Queue, support_queue: queue.Queue, stop_condition: threading.Event,
+    # Method used to show landmarks on screen
+    def start_detection_draw(self, landmark_queue: queue.Queue, support_queue: queue.Queue, stop_condition: threading.Event,
                         num_hands: int = 2):
         options = vision.HandLandmarkerOptions(
             base_options=self.__base_options,
@@ -77,3 +78,16 @@ class HandDetection:
             except queue.Full:
                 print('Landmark queue is full, skipped frame.')
                 pass
+
+    # Method used to extract landmarks by images and use them in the NN
+    def start_detection_landmark(self, frame, num_hands: int = 2):
+        options = vision.HandLandmarkerOptions(
+            base_options=self.__base_options,
+            num_hands=num_hands)
+
+        self.__landmarker = vision.HandLandmarker.create_from_options(options)
+
+        image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame)
+
+        detection_result = self.__landmarker.detect(image)
+        return detection_result.hand_landmarks
