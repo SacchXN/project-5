@@ -1,53 +1,75 @@
 import os
+import re
 import pickle
 import cv2 as cv
 from HandDetection import hand_detection
 
-# Define path for videos to extract frames from for the dataset
-path = '../../videos'
+# TODO: improve the gestures-label-gestures dictionaries?
 
-detection = hand_detection.HandDetection()
-landmarks_collection = []
-videos = os.listdir(path)
+# Gestures-label dictionary
+gestures = {
+    'open': 0,
+    'claw': 1
+}
 
-# TODO: improve dataset building where there are more than one videos for same gesture i.e.:open_1.mp4, open_2.mp4, ...
-# Possible solution: dict with keys being gesture names (open, claw, gun, ...) and values being labels (0, 1, 2, ...)
-#                    and check file names with regex (str.match('claw.*'))
+# Labels-gestures dictionary
+labels = {
+    0: 'open',
+    1: 'claw'
+}
 
-for idx, path in enumerate([os.path.join(path, file_name) for file_name in videos]):
-    print(f"Index: {idx}, path: {path}")
-    cap = cv.VideoCapture(path)
+if __name__ == "__main__":
 
-    while cap.isOpened():
-        ret, frame = cap.read()
 
-        if not ret:
-            print('No frame from video.')
+    # Define path for videos to extract frames from for the dataset
+    path = r'..\..\videos'
+
+    detection = hand_detection.HandDetection()
+    videos = os.listdir(path)
+    landmarks_collection = []
+
+    for path in [os.path.join(path, file_name) for file_name in videos]:
+        idx = -1
+
+        for key in gestures:
+            if re.match(f'.*{key}.*', path):
+                idx = gestures[key]
+
+        if idx == -1:
+            print("Loaded video doesn't have any expected gesture.\n")
             break
 
-        landmarks = detection.start_detection_landmark(frame, 1)
+        print(f"Index: {idx}, path: {path}")
+        cap = cv.VideoCapture(path)
 
-        if landmarks:
-            temp = []
-            for landmark in landmarks[0]:  # landmarks[0] being the landmarks of the first and only hand
-                temp.append(landmark.x)
-                temp.append(landmark.y)
-                temp.append(landmark.z)
-            temp.append(idx)
-            landmarks_collection.append(temp)
+        while cap.isOpened():
+            ret, frame = cap.read()
 
-        cv.imshow('frame', frame)
-        if cv.waitKey(1) == ord('q'):
-            break
+            if not ret:
+                print('No frame from video.')
+                break
 
-    cap.release()
-    cv.destroyAllWindows()
+            landmarks = detection.start_detection_landmark(frame, 1)
 
-# Saving the dataset locally
-try:
-    with open('landmarks_collection.pkl', 'wb') as f:
-        pickle.dump(landmarks_collection, f)
-except Exception as e:
-    print(f'Error saving pickle data: {e}')
+            if landmarks:
+                temp = []
+                for landmark in landmarks[0]:  # landmarks[0] being the landmarks of the first and only hand
+                    temp.append(landmark.x)
+                    temp.append(landmark.y)
+                    temp.append(landmark.z)
+                temp.append(idx)
+                landmarks_collection.append(temp)
 
+            cv.imshow('frame', frame)
+            if cv.waitKey(1) == ord('q'):
+                break
 
+        cap.release()
+        cv.destroyAllWindows()
+
+    # Saving the dataset locally
+    try:
+        with open(r'..\..\videos\landmarks_collection.pkl', 'wb') as f:
+            pickle.dump(landmarks_collection, f)
+    except Exception as e:
+        print(f'Error saving pickle data: {e}')

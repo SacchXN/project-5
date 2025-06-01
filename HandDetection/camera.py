@@ -8,7 +8,7 @@ CAMERA_FRAME_HEIGHT = cv.CAP_PROP_FRAME_HEIGHT
 
 class Capture:
     def __init__(self, width = CAMERA_FRAME_WIDTH, height = CAMERA_FRAME_HEIGHT):
-        self.__camera = cv.VideoCapture(r"C:\Users\sacch\Documents\GitHub\pred.mp4")
+        self.__camera = cv.VideoCapture(0)
         self.__width = width
         self.__height = height
 

@@ -6,8 +6,8 @@ DEVICE = "cpu"
 print(f"Using {DEVICE} device.\n")
 
 # Hyperparameters
-EPOCHS = 200
-BATCH_SIZE = 16
+EPOCHS = 150
+BATCH_SIZE = 8
 LEARNING_RATE = 0.01
 
 class NeuralNetwork(nn.Module):

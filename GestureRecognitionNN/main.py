@@ -1,6 +1,7 @@
 import pickle
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 from sklearn.model_selection import train_test_split
 import seaborn as sns
 import torch
@@ -9,7 +10,7 @@ from neural_network import *
 
 # Importing dataset
 try:
-    with open('landmarks_collection.pkl', 'rb') as f:
+    with open(r'..\..\videos\landmarks_collection.pkl', 'rb') as f:
         dataset = pickle.load(f)
 except Exception as e:
     print(f'Error reading pickle data: {e}\n '
@@ -25,6 +26,7 @@ y = dataset[:,63:]
 # Transform numpy arrays into pytorch tensors
 X = torch.from_numpy(X).float()
 y = torch.from_numpy(y).squeeze().long()
+print(pd.Series(y).value_counts())
 
 # Create train, validation and test split
 X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.6)
@@ -68,9 +70,3 @@ sns.lineplot(x=np.arange(0,len(train_loss),1), y=train_loss, label='train')
 sns.lineplot(x=np.arange(0,len(valid_loss),1), y=valid_loss, label='valid')
 plt.legend()
 plt.show()
-
-## Test1: registrato due nuovi video in cui i frame riconosciuti sono entrambi ~600.
-##        Training e valid loss sembrano più costanti e decrescenti con e:50, bs:128, lr:0.01.
-## Test2: e:100, bs:32, lr:0.01: training e valid loss migliorate ma accuracy molto bassa (~15%)
-## Test3: layer1 in:63 out:128 -> in:63 out:64, layer2 in:128 out:64 -> in:64 out 32, layer3 in:64 out:2 -> in:32 out:2
-##        l'accuracy non era bassa, era la metric ad essere scritta male (corretti/batch_size invece che corretti/len(dataset))

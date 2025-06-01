@@ -6,6 +6,7 @@ import camera
 import hand_detection
 from GestureRecognitionNN import neural_network
 from GestureRecognitionNN.neural_network import DEVICE
+from GestureRecognitionNN.dataset_building import labels
 
 # NOTE ON CV2 AND THREADING INTERACTION:
 # The stream of cv2.imshow() needs to be in the main because there can be freezes or issues if being used within
@@ -42,7 +43,8 @@ model.eval()
 while True:
 
     if not camera_queue.empty():
-        # TODO: fixare il problema in sto branch, bisogna capire perché non prende l'array di landmarks in input
+        # TODO: both streams look really laggy, probably because there are too many calculations being done in the while
+        #       Possible solutions: separate thread for the gesture recognition part? Line 50 to 59
         frame = camera_queue.get()
         cv.imshow('Frame', frame)
         landmarks = detection.start_detection_landmark(frame, 1)
@@ -54,9 +56,7 @@ while True:
                 temp.append(landmark.z)
             X = torch.tensor(temp).unsqueeze(0).float()
             pred = model(X)
-            print(f'Prediciton: {pred.argmax(1)}')
-
-
+            print(f'Prediciton: {labels[pred.argmax(1).item()]}')
 
     if not landmark_queue.empty():
         cv.imshow('Landmark', landmark_queue.get())
