@@ -1,8 +1,11 @@
 import queue
 import threading
 import cv2 as cv
+import torch
 import camera
 import hand_detection
+from GestureRecognitionNN import neural_network
+from GestureRecognitionNN.neural_network import DEVICE
 
 # NOTE ON CV2 AND THREADING INTERACTION:
 # The stream of cv2.imshow() needs to be in the main because there can be freezes or issues if being used within
@@ -16,24 +19,44 @@ camera_queue = queue.Queue(maxsize=10)
 landmark_queue = queue.Queue(maxsize=10)
 support_queue = queue.Queue(maxsize=10)
 stop_condition = threading.Event()
+detection = hand_detection.HandDetection()
 
 # Camera thread
 video = camera.Capture()
-video_thread = threading.Thread(target=video.start_video, args=(camera_queue, support_queue, stop_condition))
+video_thread = threading.Thread(target=video.start_video,
+                                args=(camera_queue, support_queue, stop_condition))
 video_thread.start()
 
 # Hand detection thread
 hand_detect = hand_detection.HandDetection()
-hand_thread = threading.Thread(target=hand_detect.start_detection_draw, args=(landmark_queue, support_queue, stop_condition,
-                                                                         2))
+hand_thread = threading.Thread(target=hand_detect.start_detection_draw,
+                               args=(landmark_queue, support_queue, stop_condition, 2))
 hand_thread.start()
+
+model = neural_network.NeuralNetwork().to(DEVICE)
+model.load_state_dict(torch.load('../GestureRecognitionNN/model_weights.pth', weights_only=True))
+model.eval()
 
 # showOnScreen:
 # Show camera and landmark frames on screen
 while True:
 
     if not camera_queue.empty():
-        cv.imshow('Frame', camera_queue.get())
+        # TODO: fixare il problema in sto branch, bisogna capire perché non prende l'array di landmarks in input
+        frame = camera_queue.get()
+        cv.imshow('Frame', frame)
+        landmarks = detection.start_detection_landmark(frame, 1)
+        if landmarks:
+            temp = []
+            for landmark in landmarks[0]:  # landmarks[0] being the landmarks of the first and only hand
+                temp.append(landmark.x)
+                temp.append(landmark.y)
+                temp.append(landmark.z)
+            X = torch.tensor(temp).unsqueeze(0).float()
+            pred = model(X)
+            print(f'Prediciton: {pred.argmax(1)}')
+
+
 
     if not landmark_queue.empty():
         cv.imshow('Landmark', landmark_queue.get())
