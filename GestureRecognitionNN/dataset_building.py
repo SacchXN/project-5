@@ -9,35 +9,35 @@ from HandDetection import hand_detection
 # Gestures-label dictionary
 gestures = {
     'open': 0,
-    'claw': 1
+    'claw': 1,
+    'v': 2
 }
 
 # Labels-gestures dictionary
 labels = {
     0: 'open',
-    1: 'claw'
+    1: 'claw',
+    2: 'v'
 }
 
 if __name__ == "__main__":
-
-
     # Define path for videos to extract frames from for the dataset
-    path = r'..\..\videos'
+    path = r'..\..\project-5_videos'
 
     detection = hand_detection.HandDetection()
     videos = os.listdir(path)
     landmarks_collection = []
 
     for path in [os.path.join(path, file_name) for file_name in videos]:
-        idx = -1
 
+        idx = -1
         for key in gestures:
-            if re.match(f'.*{key}.*', path):
+            if re.match(f'{key}[0-9]\\.mp4', path.split('\\')[-1]):
                 idx = gestures[key]
 
         if idx == -1:
             print("Loaded video doesn't have any expected gesture.\n")
-            break
+            continue
 
         print(f"Index: {idx}, path: {path}")
         cap = cv.VideoCapture(path)
@@ -69,7 +69,7 @@ if __name__ == "__main__":
 
     # Saving the dataset locally
     try:
-        with open(r'..\..\videos\landmarks_collection.pkl', 'wb') as f:
+        with open(r'..\..\project-5_dataset\landmarks_collection.pkl', 'wb') as f:
             pickle.dump(landmarks_collection, f)
     except Exception as e:
         print(f'Error saving pickle data: {e}')

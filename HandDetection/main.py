@@ -56,7 +56,7 @@ while True:
                 temp.append(landmark.z)
             X = torch.tensor(temp).unsqueeze(0).float()
             pred = model(X)
-            print(f'Prediciton: {labels[pred.argmax(1).item()]}')
+            print(f'Prediction: {labels[pred.argmax(1).item()]}')
 
     if not landmark_queue.empty():
         cv.imshow('Landmark', landmark_queue.get())

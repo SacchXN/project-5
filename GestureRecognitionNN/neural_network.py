@@ -10,6 +10,13 @@ EPOCHS = 150
 BATCH_SIZE = 8
 LEARNING_RATE = 0.01
 
+# When working with 2 labels, the following setup works well
+# l1: 63-16, l2: 16-4, l3: 4-3
+
+# When working with 3 labels, probably the 4 output neurons in l2 are not enough to carry the necessary information
+# to represent 3 classes, both training and validation loss hardly decrease. (Dataset is balanced, 0:875, 1:712, 2:687)
+# Layers changed to l1: 63-16, l2: 16-8, l3: 8-3
+
 class NeuralNetwork(nn.Module):
     def __init__(self):
         super().__init__()
@@ -17,9 +24,9 @@ class NeuralNetwork(nn.Module):
         self.linear_relu_stack = nn.Sequential(
             nn.Linear(63, 16),
             nn.ReLU(),
-            nn.Linear(16, 4),
+            nn.Linear(16, 8),
             nn.ReLU(),
-            nn.Linear(4, 2)
+            nn.Linear(8, 3)
         )
 
     def forward(self, x):

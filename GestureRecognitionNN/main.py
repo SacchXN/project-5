@@ -8,9 +8,11 @@ import torch
 from torch.utils.data import DataLoader, TensorDataset
 from neural_network import *
 
+# TODO: cross-validation for the neural network training?
+#       'v' sign is hardly getting recognized in live stream despite model having good accuracy. Check per class accuracy.
 # Importing dataset
 try:
-    with open(r'..\..\videos\landmarks_collection.pkl', 'rb') as f:
+    with open(r'..\..\project-5_dataset\landmarks_collection.pkl', 'rb') as f:
         dataset = pickle.load(f)
 except Exception as e:
     print(f'Error reading pickle data: {e}\n '
