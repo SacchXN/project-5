@@ -10,14 +10,14 @@ from HandDetection import hand_detection
 gestures = {
     'open': 0,
     'claw': 1,
-    'v': 2
+    'fist': 2
 }
 
 # Labels-gestures dictionary
 labels = {
     0: 'open',
     1: 'claw',
-    2: 'v'
+    2: 'fist'
 }
 
 if __name__ == "__main__":

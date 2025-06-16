@@ -17,6 +17,8 @@ LEARNING_RATE = 0.01
 # to represent 3 classes, both training and validation loss hardly decrease. (Dataset is balanced, 0:875, 1:712, 2:687)
 # Layers changed to l1: 63-16, l2: 16-8, l3: 8-3
 
+# 16/06/25: It probably was the 'v' sign being hard to recognize. When 'fist' is added, the model loss starts decreasing
+#           way faster. Epochs could be reduced from 150 to 70~100.
 class NeuralNetwork(nn.Module):
     def __init__(self):
         super().__init__()

@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
-import seaborn as sns
 import torch
 from torch.utils.data import DataLoader, TensorDataset
 from neural_network import *
@@ -67,8 +66,9 @@ torch.save(model.state_dict(), 'model_weights.pth')
 accuracy, pred_list, y_list = test_loop(test_dataloader, model)
 print(f'Accuracy: {accuracy}')
 
-sns.set_theme()
-sns.lineplot(x=np.arange(0,len(train_loss),1), y=train_loss, label='train')
-sns.lineplot(x=np.arange(0,len(valid_loss),1), y=valid_loss, label='valid')
+plt.figure()
+plt.plot(np.arange(0,len(train_loss),1), train_loss, label='train')
+plt.plot(np.arange(0,len(valid_loss),1), valid_loss, label='valid')
+plt.grid()
 plt.legend()
 plt.show()
