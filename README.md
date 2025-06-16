@@ -1,5 +1,5 @@
 # Introduction
-Project-5 centers on building a hand gesture recognition system. Utilizing MediaPipe for efficient hand landmark detection and OpenCV for real-time video processing, the software extracts key hand features. These features then feed into a neural network, designed and trained with PyTorch, to accurately classify a range of gestures and translate them into inputs for an interactive digital environment.
+This project centers on building a hand gesture recognition system. Utilizing MediaPipe for efficient hand landmark detection and OpenCV for real-time video processing, the software extracts key hand features. These features then feed into a neural network, designed and trained with PyTorch, to accurately classify a range of gestures and translate them into inputs for an interactive digital environment.
 
 
 ---
